@@ -7,7 +7,6 @@ import { uploadData, getAll, deleteRecord } from "../actions/board";
 import 'rc-datepicker/lib/style.css';
 
 function Dashboard() {
-
   const dispatch = useDispatch()
   const store = useSelector(state => state.board);
 
@@ -27,7 +26,10 @@ function Dashboard() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [myMusic, setMusic] = useState('');
+  const [musicUrl, setMusicURL] = useState('');
+  const [musicTitle, setMusicTitle] = useState('');
 
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
   useEffect(() => {
     dispatch(getAll());
@@ -61,11 +63,17 @@ function Dashboard() {
 
   const onDeleteItem = (id) => {
     if (window.confirm('Are you sure you wish to delete this item?'))
-      dispatch(deleteRecord(id));
+      dispatch(deleteRecord(id))
+        .then((res) => {
+          if (res && res.success == "success")
+            setMusicURL('');
+        })
   }
 
-  const onPlayMusic = () => {
-    console.log("play music");
+  const onSelectMusic = (e) => {
+    setMusicURL(SERVER_URL + e.target.dataset.path);
+    setMusicTitle(e.currentTarget.title);
+    console.log("play title: ", musicTitle);
   }
 
   return (
@@ -209,7 +217,8 @@ function Dashboard() {
                             <div
                               className="text-sm text-gray-500 cursor-pointer hover:underline"
                               title={value.mutitle}
-                              onClick={onPlayMusic}
+                              data-path={value.mupath}
+                              onClick={e => onSelectMusic(e)}
                             >
                               {value.mutitle.substr(0, 20) + " ..."}
                             </div>
@@ -217,7 +226,7 @@ function Dashboard() {
                           <td className="whitespace-nowrap text-center">
                             <span
                               id={value.id}
-                              className="text-red-400 hover:text-gray-100 cursor-pointer"
+                              className="text-red-400 hover:text-gray-500 cursor-pointer"
                               onClick={(e) => onDeleteItem(e.currentTarget.id)}
                             >
                               <i className="material-icons-round text-base">delete_outline</i>
@@ -231,10 +240,15 @@ function Dashboard() {
               </div>
               <div>
                 <figure>
-                  <figcaption>Listen to the T-Rex:</figcaption>
+                  <figcaption
+                    className="mb-2 text-gray-800 font-bold"
+                  >{musicTitle}</figcaption>
                   <audio
+                    className="w-full"
                     controls
-                    src="/media/cc0-audio/t-rex-roar.mp3">
+                    src={musicUrl}
+                    autoPlay
+                  >
                     Your browser does not support the
                     <code>audio</code> element.
                   </audio>
