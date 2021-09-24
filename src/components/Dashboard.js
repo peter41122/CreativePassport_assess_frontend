@@ -27,7 +27,7 @@ function Dashboard() {
   const [lastName, setLastName] = useState('');
   const [myMusic, setMusic] = useState('');
   const [musicUrl, setMusicURL] = useState('');
-  const [musicTitle, setMusicTitle] = useState('');
+  const [musicTitle, setMusicTitle] = useState('Music player');
 
   const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -51,6 +51,14 @@ function Dashboard() {
     formData.append("music", myMusic);
 
     dispatch(uploadData(formData));
+
+    setBirthDay('');
+    setInterests('');
+    setFirstName('');
+    setLastName('');
+    setMusic('');
+    setMusicURL('');
+    setMusicTitle('');  
   }
 
   const isEmpty = (obj) => {
@@ -65,14 +73,15 @@ function Dashboard() {
     if (window.confirm('Are you sure you wish to delete this item?'))
       dispatch(deleteRecord(id))
         .then((res) => {
-          if (res && res.success == "success")
+          if (res && res.success === "success")
             setMusicURL('');
+            setMusicTitle('Music player')
         })
   }
 
   const onSelectMusic = (e) => {
     setMusicURL(SERVER_URL + e.target.dataset.path);
-    setMusicTitle(e.currentTarget.title);
+    setMusicTitle('Music player - ' + e.currentTarget.title);
     console.log("play title: ", musicTitle);
   }
 
@@ -93,6 +102,7 @@ function Dashboard() {
                   id="firstName"
                   type="text"
                   placeholder="First Name"
+                  value={firstName}
                   required
                   onChange={e => setFirstName(e.target.value)}
                 />
@@ -110,6 +120,7 @@ function Dashboard() {
                   id="lastName"
                   type="text"
                   placeholder="Last Name"
+                  value={lastName}
                   required
                   onChange={e => setLastName(e.target.value)}
                 />
@@ -238,10 +249,10 @@ function Dashboard() {
                   </tbody>
                 </table>
               </div>
-              <div>
+              <div className="mb-8">
                 <figure>
                   <figcaption
-                    className="mb-2 text-gray-800 font-bold"
+                    className="mb-2 text-gray-800 font-bold text-left pl-5"
                   >{musicTitle}</figcaption>
                   <audio
                     className="w-full"
@@ -253,7 +264,6 @@ function Dashboard() {
                     <code>audio</code> element.
                   </audio>
                 </figure>
-
               </div>
             </div>
           </div>
